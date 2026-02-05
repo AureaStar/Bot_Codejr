@@ -23,9 +23,20 @@ const CANAIS_SEDE_IDS = [process.env.SEDE_VIRTUAL,
 
 function carregarDados() {
     if (!fs.existsSync(DATA_FILE)) {
-        fs.writeFileSync(DATA_FILE, JSON.stringify({ ativos: {}, historico: {} }, null, 4));
+        fs.writeFileSync(DATA_FILE, JSON.stringify({ 
+            ativos: {}, 
+            historico: {}, 
+            arquivo_morto: {}
+        }, null, 4));
     }
-    return JSON.parse(fs.readFileSync(DATA_FILE));
+    
+    const dados = JSON.parse(fs.readFileSync(DATA_FILE));
+
+    if (!dados.arquivo_morto) {
+        dados.arquivo_morto = {};
+    }
+
+    return dados;
 }
 
 function salvarDados(dados) {
@@ -276,9 +287,19 @@ client.on('messageCreate', async message => {
 
 cron.schedule('59 23 * * 0', () => {
     const dados = carregarDados();
+    
+    const dataHoje = new Date().toLocaleDateString('pt-BR');
+    
+    if (Object.keys(dados.historico).length > 0) {
+        dados.arquivo_morto[dataHoje] = dados.historico;
+        console.log(`Dados da semana salvos no arquivo morto em: ${dataHoje}`);
+    }
+
     dados.historico = {};
+    
     salvarDados(dados);
-    console.log("Semana resetada!");
+    console.log("Semana resetada para nova contagem!");
+
 }, { timezone: "America/Sao_Paulo" });
 
 client.login(process.env.TOKEN);
