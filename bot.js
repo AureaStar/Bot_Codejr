@@ -226,6 +226,52 @@ client.on('messageCreate', async message => {
             message.delete().catch(() => {});
         }, 60000);
     }
+
+    if (message.content === '!sedefim') {
+        if (!message.member.voice.channel) {
+            return message.reply("Você precisa estar em um canal de voz para usar este comando.");
+        }
+
+        if (!CANAIS_SEDE_IDS.includes(message.member.voice.channelId)) {
+            return message.reply("Você não está contando horas na Sede no momento.");
+        }
+
+        const dados = carregarDados();
+        const userId = message.author.id;
+        
+        let tempoTotalMs = dados.historico[userId]?.totalMs || 0;
+        
+        if (dados.ativos[userId]) {
+            const sessaoAtual = Date.now() - dados.ativos[userId];
+            tempoTotalMs += sessaoAtual;
+        }
+
+        const totalSegundos = Math.floor(tempoTotalMs / 1000);
+        const horas = Math.floor(totalSegundos / 3600);
+        const minutos = Math.floor((totalSegundos % 3600) / 60);
+        const segundos = totalSegundos % 60;
+
+        const resposta = await message.reply(
+            `Parabéns pelo foco, <@${userId}>! 🚀\nVocê encerrou por hoje com um total acumulado de: **${horas}h ${minutos}m ${segundos}s**.`
+        );
+
+        try {
+            const canalSaideira = process.env.SAIDEIRA;
+            if (canalSaideira) {
+                await message.member.voice.setChannel(canalSaideira);
+            } else {
+                console.log("ERRO: ID da SAIDEIRA não configurado no .env");
+            }
+        } catch (error) {
+            console.error("Erro ao mover usuário:", error);
+            message.channel.send("Não consegui te mover para a Saideira. Verifique minhas permissões.");
+        }
+
+        setTimeout(() => {
+            resposta.delete().catch(() => {});
+            message.delete().catch(() => {});
+        }, 60000);
+    }
 });
 
 cron.schedule('59 23 * * 0', () => {
