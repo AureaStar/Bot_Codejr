@@ -269,7 +269,7 @@ client.on('messageCreate', async message => {
         try {
             const canalSaideira = process.env.SAIDEIRA;
             if (canalSaideira) {
-                // await message.member.voice.setChannel(canalSaideira);
+                 await message.member.voice.setChannel(canalSaideira);
             } else {
                 console.log("ERRO: ID da SAIDEIRA não configurado no .env");
             }
