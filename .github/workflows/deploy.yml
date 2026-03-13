@@ -1,4 +1,4 @@
-name: Deploy na VM
+name: DEPLOY_AUTOMATICO
 
 on:
   push:
@@ -10,18 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validar secrets
+        run: |
+          echo "USER=[${{ secrets.VM_USER }}]"
+          echo "HOST=[${{ secrets.VM_HOST }}]"
+          [ -n "${{ secrets.VM_USER }}" ] || (echo "VM_USER vazio" && exit 1)
+          [ -n "${{ secrets.VM_HOST }}" ] || (echo "VM_HOST vazio" && exit 1)
+          [ -n "${{ secrets.VM_SSH_KEY }}" ] || (echo "VM_SSH_KEY vazio" && exit 1)
+
       - name: Configurar chave SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s\n' "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Atualizar projeto na VM
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} '
+          ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" "
             cd /home/opc/apps/Bot_Codejr &&
             git pull origin main &&
             npm install &&
-            pm2 restart code-bot 
-          '
+            pm2 restart code-bot
+          "
