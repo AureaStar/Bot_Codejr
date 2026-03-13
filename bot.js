@@ -102,10 +102,10 @@ client.on('messageCreate', async message => {
             `Olá <@${alvo.id}>, o tempo acumulado na sede esta semana é de: **${horas}h ${minutos}m ${segundos}s**.`
         );
 
-        setTimeout(() => {
-            resposta.delete().catch(err => console.log("Erro ao deletar resposta:", err));
-            message.delete().catch(err => console.log("Erro ao deletar comando:", err));
-        }, 60000);
+        // setTimeout(() => {
+        //     resposta.delete().catch(err => console.log("Erro ao deletar resposta:", err));
+        //     message.delete().catch(err => console.log("Erro ao deletar comando:", err));
+        // }, 60000);
     }
 
     if (message.content === '!exportar') {
@@ -153,10 +153,10 @@ client.on('messageCreate', async message => {
 
         const respostaRank = await message.reply(msgRank);
 
-        setTimeout(() => {
-            respostaRank.delete().catch(() => {});
-            message.delete().catch(() => {});
-        }, 60000);
+        // setTimeout(() => {
+        //     respostaRank.delete().catch(() => {});
+        //     message.delete().catch(() => {});
+        // }, 60000);
     }
 
     if (message.content.startsWith('!perfil')) {
@@ -232,10 +232,10 @@ client.on('messageCreate', async message => {
         const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'perfil.png' });
         const resposta = await message.reply({ files: [attachment] });
 
-        setTimeout(() => {
-            resposta.delete().catch(() => {});
-            message.delete().catch(() => {});
-        }, 60000);
+        // setTimeout(() => {
+        //     resposta.delete().catch(() => {});
+        //     message.delete().catch(() => {});
+        // }, 60000);
     }
 
     if (message.content === '!sedefim') {
@@ -278,10 +278,10 @@ client.on('messageCreate', async message => {
             message.channel.send("Não consegui te mover para a Saideira. Verifique minhas permissões.");
         }
 
-        setTimeout(() => {
-            resposta.delete().catch(() => {});
-            message.delete().catch(() => {});
-        }, 60000);
+        // setTimeout(() => {
+        //     resposta.delete().catch(() => {});
+        //     message.delete().catch(() => {});
+        // }, 60000);
     }
 });
 
